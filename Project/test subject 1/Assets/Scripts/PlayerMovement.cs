@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private SpriteRenderer sprite;
     private Animator anim;
 
-    
+    private bool isOnTheGround = true;
 
     
 
@@ -39,12 +39,13 @@ public class PlayerMovement : MonoBehaviour
 
       //moving A-D
       float xDir = Input.GetAxis("Horizontal");
-      rb.velocity = new Vector2(xDir * ms, rb.velocity.y);
+        rb.velocity = new Vector2(xDir * ms, rb.velocity.y);
       
       //spacebar jump
-      if (Input.GetButtonDown("Jump") && IsOnTheGround()) 
+      if (Input.GetButtonDown("Jump") && isOnTheGround) 
       {
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            rb.AddForce(new Vector2(rb.velocity.x, jumpForce));
+            isOnTheGround = false;
       } 
     }
         
@@ -84,7 +85,13 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsOnTheGround() 
     {
-      return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpable);
+        //return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpable);
+        return true;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.CompareTag("Ground")) {
+            isOnTheGround = true;
+        }
+    }
 }

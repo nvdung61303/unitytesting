@@ -6,7 +6,7 @@ public class CameraMovement : MonoBehaviour
 {
     
     public GameObject player;
-    [SerializeField] private float offset;
+    [SerializeField] private Vector3 offset = new Vector3(0, 0, -5);
     [SerializeField] private float cameraSpeed;
     private Vector3 playerVector;
 
@@ -17,19 +17,8 @@ public class CameraMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update()
+    void FixedUpdate()
     {
-        playerVector = new Vector3(player.transform.position.x, player.transform.position.y , transform.position.z);
-
-        if (player.transform.localScale.x > 0f) 
-        {
-            playerVector = new Vector3(playerVector.x + offset, playerVector.y , playerVector.z);
-        }
-        else 
-        {
-            playerVector = new Vector3(playerVector.x - offset, playerVector.y , playerVector.z);
-        }
-
-        transform.position = Vector3.Lerp(transform.position, playerVector, cameraSpeed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, player.transform.position + offset, Time.deltaTime);
     }
 }
