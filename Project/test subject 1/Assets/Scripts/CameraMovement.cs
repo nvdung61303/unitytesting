@@ -10,6 +10,12 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private float cameraSpeed;
     private Vector3 playerVector;
 
+    [SerializeField] private float limitXLeft;
+    [SerializeField] private float limitXRight;
+    [SerializeField] private float limitYDown;
+    [SerializeField] private float limitYUp;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +25,11 @@ public class CameraMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        transform.position = Vector3.Lerp(transform.position, player.transform.position + offset, Time.deltaTime);
+        playerVector = new Vector3(
+            Mathf.Clamp(player.transform.position.x, limitXLeft, limitXRight),
+            Mathf.Clamp(player.transform.position.y, limitYDown, limitYUp),
+            player.transform.position.z
+        );
+        transform.position = Vector3.Lerp(transform.position, playerVector + offset, Time.deltaTime * cameraSpeed);
     }
 }

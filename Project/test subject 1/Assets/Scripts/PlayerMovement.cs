@@ -7,18 +7,21 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D coll;
     private SpriteRenderer sprite;
-    private Animator anim;
+    // private Animator anim;
 
+    //ground checker
     private bool isOnTheGround = true;
-
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius;
+    [SerializeField] private LayerMask jumpable;
     
 
     //movement variables
     private float xDir = 0f;
     [SerializeField] private float ms = 5f; //movespeed
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private LayerMask jumpable;
-    public float gravityModifier = 2;
+    [SerializeField] private float gravityModifier = 1f;
+
 
     private enum MovementState { idle, running, jumping, falling } //character moving state
     // Start is called before the first frame update
@@ -27,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
        rb = GetComponent<Rigidbody2D>();
        coll = GetComponent<BoxCollider2D>();
        sprite = GetComponent<SpriteRenderer>();
-       anim = GetComponent<Animator>();
+      //  anim = GetComponent<Animator>();
        Physics2D.gravity *= gravityModifier;
     }
 
@@ -39,59 +42,56 @@ public class PlayerMovement : MonoBehaviour
 
       //moving A-D
       float xDir = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(xDir * ms, rb.velocity.y);
+      rb.velocity = new Vector2(xDir * ms, rb.velocity.y);
       
       //spacebar jump
+      isOnTheGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, jumpable);
       if (Input.GetButtonDown("Jump") && isOnTheGround) 
       {
-            rb.AddForce(new Vector2(rb.velocity.x, jumpForce));
-            isOnTheGround = false;
-      } 
+        rb.AddForce(new Vector2(rb.velocity.x, jumpForce));
+        isOnTheGround = false;
+      }
+
+      if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+      {
+      rb.AddForce(new Vector2(rb.velocity.x, rb.velocity.y * 0.4f));
+      }
+
+      // UpdateCharacterAnimationState(); 
     }
         
         
-    private void UpdateCharacterAnimationState()
-    {
-        MovementState state;
+    // private void UpdateCharacterAnimationState()
+    // {
+    //     MovementState state;
 
-        //detect character action
-        if (xDir > 0f)
-        {
-          state = MovementState.running;
-          sprite.flipX = false;
-        }
-        else if (xDir < 0f)
-        {
-          state = MovementState.running;
-          sprite.flipX = true;
-        }
-        else
-        {
-          state = MovementState.idle;
-        }
+    //     //detect character action
+    //     if (xDir > 0f)
+    //     {
+    //       state = MovementState.running;
+    //       sprite.flipX = false;
+    //     }
+    //     else if (xDir < 0f)
+    //     {
+    //       state = MovementState.running;
+    //       sprite.flipX = true;
+    //     }
+    //     else
+    //     {
+    //       state = MovementState.idle;
+    //     }
 
-        if (rb.velocity.y > .1f)
-        {
-          state = MovementState.jumping;
-        }
-        else if (rb.velocity.y < -.1f)
-        {
-          state = MovementState.falling;
-        }
+    //     if (rb.velocity.y > .1f)
+    //     {
+    //       state = MovementState.jumping;
+    //     }
+    //     else if (rb.velocity.y < -.1f)
+    //     {
+    //       state = MovementState.falling;
+    //     }
 
-        //cast corresponding animation
-        anim.SetInteger("state", (int)state);
-    }
+    //     //cast corresponding animation
+    //     anim.SetInteger("state", (int)state);
+    // }
 
-    private bool IsOnTheGround() 
-    {
-        //return Physics2D.BoxCast(coll.bounds.center, coll.bounds.size, 0f, Vector2.down, .1f, jumpable);
-        return true;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("Ground")) {
-            isOnTheGround = true;
-        }
-    }
 }
