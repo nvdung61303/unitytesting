@@ -18,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float ms = 5f; //movespeed
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private LayerMask jumpable;
+    public float gravityModifier = 2;
 
     private enum MovementState { idle, running, jumping, falling } //character moving state
     // Start is called before the first frame update
@@ -27,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
        coll = GetComponent<BoxCollider2D>();
        sprite = GetComponent<SpriteRenderer>();
        anim = GetComponent<Animator>();
+       Physics2D.gravity *= gravityModifier;
     }
 
     // Update is called once per frame
@@ -42,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
       //spacebar jump
       if (Input.GetButtonDown("Jump") && IsOnTheGround()) 
       {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
       } 
     }
         
